@@ -1,4 +1,3 @@
-use std::fmt::format;
 use std::thread;
 use std::time::Duration;
 
@@ -15,16 +14,16 @@ fn main() {
     let body = String::from("Hope you are doing well!");
 
     match send_email(EmailMsg { from, to, subject, body }) {
-        Ok(res) => println!("{}", res),
+        Ok(_) => println!("Succesfully sent email"),
         Err(err) => println!("{}", err)
     }
 }
 
 
-fn send_email(email: EmailMsg) -> Result<String, String> {
+fn send_email(email: EmailMsg) -> Result<(), Box<dyn std::error::Error>> {
     thread::sleep(Duration::new(5, 0));
 
-    Ok(format!("Succesfully sent email to {}!", email.to))
+    Ok(())
 }
 
 
