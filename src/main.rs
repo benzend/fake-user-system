@@ -1,30 +1,156 @@
-use std::thread;
-use std::time::Duration;
+use rand;
 
-struct EmailMsg {
-    from: String,
-    to: String,
-    subject: String,
-    body: String
-}
 fn main() {
-    let from = String::from("my.email@gmail.com");
-    let to = String::from("my.to.email@gmail.com");
-    let subject = String::from("Hi");
-    let body = String::from("Hope you are doing well!");
+    let mut user = User::new("ben");
 
-    match send_email(EmailMsg { from, to, subject, body }) {
-        Ok(_) => println!("Succesfully sent email"),
-        Err(err) => println!("{}", err)
+    let res = loop {
+        match user.purchase_ticket(Ticket::new(TicketKind::Lagoon)) {
+            Ok(res) => {
+                println!("User purchased ticket successfully");
+                break res;
+            },
+            Err(_) => {
+                println!("Couldn't afford to purchase ticket");
+                println!("User now has to get a job");
+                match user.get_a_job(10, JobKind::Retail) {
+                    Ok(res) => println!("User made ${}", res.payed_amount),
+                    Err(_) => println!("User fucked up")
+                };
+                continue;
+            },
+        };
+    };
+
+    println!("{:?}", res);
+
+}
+
+struct User {
+    id: u16,
+    name: String,
+    tickets: Vec<Ticket>,
+    wallet: Money
+}
+
+impl User {
+    fn new(name: &str) -> User {
+        User { 
+            id: rand::random(), 
+            name: name.to_string(), 
+            tickets: Vec::new(),
+            wallet: Money { kind: MoneyKind::Usd, amount: 0 }
+        }
+    }
+    fn add_ticket(&mut self, ticket: Ticket) {
+        self.tickets.push(ticket)
+    }
+    fn purchase_ticket(&mut self, ticket: Ticket) -> Result<(), PurchaseTicketErr> {
+        println!("wallet {}, ticket {}", self.wallet.amount, ticket.cost.amount);
+        if self.wallet.amount < ticket.cost.amount {
+            Err(PurchaseTicketErr::NotEnoughFunds)
+        } else {
+            self.wallet.amount -= ticket.cost.amount;
+            self.add_ticket(ticket);
+            Ok(())
+        }
+    }
+    fn get_a_job(&mut self, dur: u16, kind: JobKind) -> Result<JobResult, JobErr> {
+        let chance = rand::random::<u8>();
+
+        println!("res {}", &chance);
+
+        let res = match chance {
+            0 | 1 | 2 | 3 | 4 | 5 | 6 => Err(JobErr {kind: JobFailureKind::ForgotToShowUp, payed_amount: 0}),
+            7 | 8 | 9 | 10 | 11 | 12 | 13 => Err(JobErr {kind: JobFailureKind::FuckedUp, payed_amount: 10}),
+            14 | 15 | 16 | 17 | 18 | 19 | 20 => Err(JobErr {kind: JobFailureKind::LazyWorker, payed_amount: 20}),
+            _ => match kind {
+                JobKind::Retail => Ok(JobResult {payed_amount: 10 * dur}),
+                JobKind::SoftwareEngineer => Ok(JobResult {payed_amount: 30 * dur}),
+            }
+        };
+
+        match res {
+            Err(err) => {
+                self.wallet.amount += err.payed_amount;
+                Err(err)
+            },
+            Ok(got) => {
+                self.wallet.amount += got.payed_amount;
+                Ok(got)
+            }
+        }
     }
 }
 
-
-fn send_email(email: EmailMsg) -> Result<(), Box<dyn std::error::Error>> {
-    thread::sleep(Duration::new(5, 0));
-
-    Ok(())
+#[derive(Debug)]
+struct Ticket {
+    id: u16,
+    cost: Money,
+    kind: TicketKind
 }
 
+impl Ticket {
+    fn new(kind: TicketKind) -> Ticket {
+        let id = rand::random::<u16>();
+        match kind {
+            TicketKind::DisneyWorld => Ticket { id, cost: Money::new(Some(MoneyKind::Usd), 200), kind},
+            TicketKind::DisneyLand => Ticket { id, cost: Money::new(Some(MoneyKind::Usd), 150), kind},
+            TicketKind::Lagoon => Ticket { id, cost: Money::new(Some(MoneyKind::Usd), 80), kind},
+            TicketKind::ReelTheatre => Ticket { id, cost: Money::new(Some(MoneyKind::Usd), 20), kind},
+            TicketKind::Football => Ticket { id, cost: Money::new(Some(MoneyKind::Usd), 200), kind}
+        }
+    }
+}
 
+#[derive(Debug)]
+struct Money {
+    kind: MoneyKind,
+    amount: u16
+}
 
+impl Money {
+    fn new(kind: Option<MoneyKind>, amount: u16) -> Money {
+        match kind {
+            Some(k) => Money { kind: k, amount },
+            None => Money { kind: MoneyKind::Usd, amount }
+        }
+    }
+}
+
+#[derive(Debug)]
+enum MoneyKind {
+    Usd
+}
+
+#[derive(Debug)]
+enum TicketKind {
+    DisneyWorld,
+    Lagoon,
+    DisneyLand,
+    ReelTheatre,
+    Football
+}
+
+enum PurchaseTicketErr {
+    NotEnoughFunds,
+}
+
+struct JobResult {
+    payed_amount: u16
+}
+
+struct JobErr {
+    kind: JobFailureKind,
+    payed_amount: u16
+}
+
+enum JobFailureKind {
+    ForgotToShowUp,
+    LazyWorker,
+    FuckedUp
+}
+
+enum JobKind {
+    SoftwareEngineer,
+    Retail
+}
