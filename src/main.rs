@@ -59,11 +59,14 @@ impl User {
 
         println!("res {}", &chance);
 
-        let res = match chance {
-            0 | 1 | 2 | 3 | 4 | 5 | 6 => Err(JobErr {kind: JobFailureKind::ForgotToShowUp, payed_amount: 0}),
-            7 | 8 | 9 | 10 | 11 | 12 | 13 => Err(JobErr {kind: JobFailureKind::FuckedUp, payed_amount: 10}),
-            14 | 15 | 16 | 17 | 18 | 19 | 20 => Err(JobErr {kind: JobFailureKind::LazyWorker, payed_amount: 20}),
-            _ => match kind {
+        let res: Result<JobResult, JobErr> = if chance < 10 {
+            Err(JobErr {kind: JobFailureKind::ForgotToShowUp, payed_amount: 0})
+        } else if chance < 20 {
+            Err(JobErr {kind: JobFailureKind::FuckedUp, payed_amount: 10})
+        } else if chance < 30 {
+            Err(JobErr {kind: JobFailureKind::LazyWorker, payed_amount: 20})
+        } else {
+            match kind {
                 JobKind::Retail => Ok(JobResult {payed_amount: 10 * dur}),
                 JobKind::SoftwareEngineer => Ok(JobResult {payed_amount: 30 * dur}),
             }
