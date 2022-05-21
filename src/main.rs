@@ -80,7 +80,6 @@ impl User {
     }
 }
 
-#[derive(Debug)]
 struct Ticket {
     id: u16,
     cost: Money,
@@ -101,7 +100,6 @@ impl Ticket {
     }
 }
 
-#[derive(Debug)]
 struct Money {
     kind: MoneyKind,
     amount: u16
@@ -116,12 +114,10 @@ impl Money {
     }
 }
 
-#[derive(Debug)]
 enum MoneyKind {
     Usd
 }
 
-#[derive(Debug)]
 enum TicketKind {
     DisneyWorld,
     Lagoon,
