@@ -21,8 +21,6 @@ fn main() {
         };
     };
 
-    println!("{:?}", res);
-
 }
 
 struct User {
@@ -45,7 +43,6 @@ impl User {
         self.tickets.push(ticket)
     }
     fn purchase_ticket(&mut self, ticket: Ticket) -> Result<(), PurchaseTicketErr> {
-        println!("wallet {}, ticket {}", self.wallet.amount, ticket.cost.amount);
         if self.wallet.amount < ticket.cost.amount {
             Err(PurchaseTicketErr::NotEnoughFunds)
         } else {
@@ -56,8 +53,6 @@ impl User {
     }
     fn get_a_job(&mut self, dur: u16, kind: JobKind) -> Result<JobResult, JobErr> {
         let chance = rand::random::<u8>();
-
-        println!("res {}", &chance);
 
         let res: Result<JobResult, JobErr> = if chance < 10 {
             Err(JobErr {kind: JobFailureKind::ForgotToShowUp, payed_amount: 0})
