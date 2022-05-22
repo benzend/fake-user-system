@@ -16,7 +16,8 @@ impl Ticket {
           TicketKind::DisneyLand => Ticket { id, cost: Money::new(usd, 150), kind},
           TicketKind::Lagoon => Ticket { id, cost: Money::new(usd, 80), kind},
           TicketKind::ReelTheatre => Ticket { id, cost: Money::new(usd, 20), kind},
-          TicketKind::Football => Ticket { id, cost: Money::new(usd, 200), kind}
+          TicketKind::Football => Ticket { id, cost: Money::new(usd, 200), kind},
+          TicketKind::RoaringSprings => Ticket { id, cost: Money::new(usd, 100), kind}
       }
   }
 }
@@ -38,19 +39,10 @@ pub enum TicketKind {
   Lagoon,
   DisneyLand,
   ReelTheatre,
-  Football
+  Football,
+  RoaringSprings
 }
 
 pub enum PurchaseTicketErr {
   NotEnoughFunds,
 }
-
-
-// #[cfg(test)]
-// mod tests {
-//   fn picks_a_ticket() {
-//     let tr = TicketRandomizer {
-//       tickets_to_pick_from: vec![]
-//     }
-//   }
-// }
