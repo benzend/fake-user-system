@@ -1,4 +1,4 @@
 pub mod ticket;
-mod money;
-mod job;
-mod user;
+pub mod money;
+pub mod job;
+pub mod user;

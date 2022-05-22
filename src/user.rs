@@ -1,18 +1,19 @@
 use crate::money::{Money, MoneyKind};
 use crate::ticket::{Ticket, PurchaseTicketErr};
 use crate::job::{JobErr, JobKind, JobResult, JobFailureKind};
+use uuid::Uuid;
 
 pub struct User {
-  id: u16,
-  name: String,
-  tickets: Vec<Ticket>,
-  wallet: Money
+  pub id: Uuid,
+  pub name: String,
+  pub tickets: Vec<Ticket>,
+  pub wallet: Money
 }
 
 impl User {
   pub fn new(name: &str) -> User {
       User { 
-          id: rand::random(), 
+          id: Uuid::new_v4(),
           name: name.to_string(), 
           tickets: Vec::new(),
           wallet: Money { kind: MoneyKind::Usd, amount: 0 }
